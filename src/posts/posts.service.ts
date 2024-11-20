@@ -1,15 +1,32 @@
-import { Injectable } from '@nestjs/common';
+import { Body, Injectable } from '@nestjs/common';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
-
+import { BlogPost } from 'types';
+import { v4 as uuid } from 'uuid';
 @Injectable()
 export class PostsService {
-  create(createPostDto: CreatePostDto) {
-    return 'This action adds a new post';
+  private blogPosts: BlogPost[] = []; // Simulated database
+  currentTime = new Date().toISOString();
+  create(@Body() createPostDto: CreatePostDto) {
+    const newPost: BlogPost = {
+      id: uuid(), // Generate unique ID
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      title: createPostDto.title,
+      slug: createPostDto.slug,
+      content: createPostDto.content,
+      author: createPostDto.author,
+      summary: createPostDto.summary,
+      tags: createPostDto.tags,
+      category: createPostDto.category,
+      publishAt: this.currentTime,
+    };
+    this.blogPosts.push(newPost);
+    return newPost;
   }
 
   findAll() {
-    return `This action returns all posts`;
+    return this.blogPosts;
   }
 
   findOne(id: number) {
@@ -17,7 +34,15 @@ export class PostsService {
   }
 
   update(id: number, updatePostDto: UpdatePostDto) {
-    return `This action updates a #${id} post`;
+    const index = this.blogPosts.findIndex((post) => post.id === id);
+    if (index === -1) return null;
+
+    this.blogPosts[index] = {
+      ...this.blogPosts[index],
+      ...updatePostDto,
+      updatedAt: new Date().toISOString(),
+    };
+    return this.blogPosts[index];
   }
 
   remove(id: number) {
