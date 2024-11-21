@@ -9,17 +9,22 @@ export class PostsService {
   constructor(private readonly prismaService: PrismaService) {}
   // private blogPosts: BlogPost[] = []; // Simulated database
   currentTime = new Date().toISOString();
+
   create(@Body() createPostDto: CreatePostDto) {
     return this.prismaService.post.create({
       data: createPostDto,
     });
   }
 
-  findAll() {
-    return this.prismaService.post.findMany();
+  async findAll() {
+    const allPosts = await this.prismaService.post.findMany();
+    return allPosts.map((post) => ({
+      ...post,
+      tags: post.tags ? post.tags.split(',') : [], // Transform tags into an array
+    }));
   }
 
-  findOne(id: number) {
+  findOne(id: string) {
     const uniquePost = this.prismaService.post.findUnique({
       where: {
         id,
@@ -29,18 +34,23 @@ export class PostsService {
     return uniquePost;
   }
 
-  update(id: string, updatePostDto: UpdatePostDto) {
-    // const index = this.blogPosts.findIndex((post) => post.id === id);
-    // if (index === -1) return null;
-    // this.blogPosts[index] = {
-    //   ...this.blogPosts[index],
-    //   ...updatePostDto,
-    //   updatedAt: new Date().toISOString(),
-    // };
-    // return this.blogPosts[index];
+  async update(id: string, updatePostDto: UpdatePostDto) {
+    const post = await this.prismaService.post.findUnique({
+      where: {
+        id,
+      },
+    });
+    if (!post) return 'Not Found';
+    const updatedPost = await this.prismaService.post.update({
+      where: {
+        id,
+      },
+      data: updatePostDto,
+    });
+    return updatedPost;
   }
 
-  async remove(id: number) {
+  async remove(id: string) {
     const post = await this.prismaService.post.findUnique({
       where: {
         id,

@@ -2,7 +2,6 @@ import {
   IsString,
   IsNotEmpty,
   IsOptional,
-  IsArray,
   IsDateString,
 } from 'class-validator';
 
@@ -25,15 +24,15 @@ export class CreatePostDto {
 
   @IsString()
   @IsOptional()
-  summary?: string;
+  summary: string;
 
   @IsString()
   @IsOptional()
-  tags?: string;
+  tags: string;
 
   @IsString()
   @IsOptional()
-  category?: string;
+  category: string;
 
   @IsDateString()
   @IsOptional()
