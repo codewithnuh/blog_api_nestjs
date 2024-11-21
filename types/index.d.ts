@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 export interface BlogPost {
-  id: string;
+  id: number | string;
   title: string;
   slug: string;
   content: string;

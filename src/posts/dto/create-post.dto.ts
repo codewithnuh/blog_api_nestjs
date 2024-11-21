@@ -27,9 +27,9 @@ export class CreatePostDto {
   @IsOptional()
   summary?: string;
 
-  @IsArray()
+  @IsString()
   @IsOptional()
-  tags?: string[];
+  tags?: string;
 
   @IsString()
   @IsOptional()
@@ -37,7 +37,7 @@ export class CreatePostDto {
 
   @IsDateString()
   @IsOptional()
-  publishAt?: string; // For scheduled posts
+  publishAt?: string | ''; // For scheduled posts
 
   @IsDateString()
   @IsOptional()

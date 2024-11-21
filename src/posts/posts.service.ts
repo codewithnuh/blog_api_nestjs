@@ -1,51 +1,57 @@
 import { Body, Injectable } from '@nestjs/common';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
-import { BlogPost } from 'types';
-import { v4 as uuid } from 'uuid';
+// import { BlogPost } from 'types';
+// import { v4 as uuid } from 'uuid';
+import { PrismaService } from 'src/prisma/prisma.service';
 @Injectable()
 export class PostsService {
-  private blogPosts: BlogPost[] = []; // Simulated database
+  constructor(private readonly prismaService: PrismaService) {}
+  // private blogPosts: BlogPost[] = []; // Simulated database
   currentTime = new Date().toISOString();
   create(@Body() createPostDto: CreatePostDto) {
-    const newPost: BlogPost = {
-      id: uuid(), // Generate unique ID
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      title: createPostDto.title,
-      slug: createPostDto.slug,
-      content: createPostDto.content,
-      author: createPostDto.author,
-      summary: createPostDto.summary,
-      tags: createPostDto.tags,
-      category: createPostDto.category,
-      publishAt: this.currentTime,
-    };
-    this.blogPosts.push(newPost);
-    return newPost;
+    return this.prismaService.post.create({
+      data: createPostDto,
+    });
   }
 
   findAll() {
-    return this.blogPosts;
+    return this.prismaService.post.findMany();
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} post`;
+    const uniquePost = this.prismaService.post.findUnique({
+      where: {
+        id,
+      },
+    });
+    if (!uniquePost) return 'Not Found';
+    return uniquePost;
   }
 
-  update(id: number, updatePostDto: UpdatePostDto) {
-    const index = this.blogPosts.findIndex((post) => post.id === id);
-    if (index === -1) return null;
-
-    this.blogPosts[index] = {
-      ...this.blogPosts[index],
-      ...updatePostDto,
-      updatedAt: new Date().toISOString(),
-    };
-    return this.blogPosts[index];
+  update(id: string, updatePostDto: UpdatePostDto) {
+    // const index = this.blogPosts.findIndex((post) => post.id === id);
+    // if (index === -1) return null;
+    // this.blogPosts[index] = {
+    //   ...this.blogPosts[index],
+    //   ...updatePostDto,
+    //   updatedAt: new Date().toISOString(),
+    // };
+    // return this.blogPosts[index];
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} post`;
+  async remove(id: number) {
+    const post = await this.prismaService.post.findUnique({
+      where: {
+        id,
+      },
+    });
+    if (!post) return null;
+    await this.prismaService.post.delete({
+      where: {
+        id,
+      },
+    });
+    return post;
   }
 }
