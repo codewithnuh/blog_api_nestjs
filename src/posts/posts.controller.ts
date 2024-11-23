@@ -5,15 +5,16 @@ import {
   Body,
   Patch,
   Param,
-  UseGuards,
+  // UseGuards,
   Delete,
   ValidationPipe,
+  UseGuards,
 } from '@nestjs/common';
-import { JwtAuthGuard } from 'src/jwt/jwt.guard';
+// import { JwtAuthGuard } from 'src/jwt/jwt.guard';
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
-
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 @Controller('posts')
 export class PostsController {
   constructor(private readonly postsService: PostsService) {}
@@ -32,7 +33,7 @@ export class PostsController {
   findOne(@Param('id') id: string) {
     return this.postsService.findOne(id);
   }
-
+  @UseGuards(JwtAuthGuard)
   @Patch(':id')
   update(@Param('id') id: string, @Body() updatePostDto: UpdatePostDto) {
     return this.postsService.update(id, updatePostDto);
